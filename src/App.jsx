@@ -6,7 +6,12 @@ import Log from "./components/Log"
 import GameOver from './components/GameOver';
 import { WINNING_COMBINATIONS } from '../winning-combinations'; 
 
-const initialGameBoard = [
+const PLAYERS = {
+  X: "Player 1",
+  O: "Player 2"
+};
+
+const INITIAL_GAME_BOARD = [
     [null, null, null],
     [null, null, null],
     [null, null, null]
@@ -22,27 +27,7 @@ function getActivePlayer(gameTurns) {
   return currentPlayer;
 }
 
-function App() {
-  const [players, setPlayer] = useState({
-    X: "Player 1",
-    O: "Player 2"
-  })
-  const [gameTurns, setGameTurns] = useState([]);
-  const activePlayer = getActivePlayer(gameTurns);
-
-  let gameBoard = [...initialGameBoard.map(array => [...array])];
-
-  // derive state from turns object
-  // that is managed in App component 
-  // (manage as little state as needed, and 
-  // try to derive as much as you can from state)
-  for (const turn of gameTurns) {
-      const {square, player } = turn;
-      const { row, col } = square;
-
-      gameBoard[row][col] = player;
-  }
-  
+function getWinner(gameBoard) {
   let winner;
 
   for(const combination of WINNING_COMBINATIONS) {
@@ -55,8 +40,35 @@ function App() {
       firstSquare === thirdSquare) {
       winner = players[firstSquare];
     }
+
   }
 
+  return winner;
+}
+
+function getGameBoard(gameTurns) {
+  let gameBoard = [...INITIAL_GAME_BOARD.map(array => [...array])];
+
+  // derive state from turns object
+  // that is managed in App component 
+  // (manage as little state as needed, and 
+  // try to derive as much as you can from state)
+  for (const turn of gameTurns) {
+      const {square, player } = turn;
+      const { row, col } = square;
+
+      gameBoard[row][col] = player;
+  }
+
+  return gameBoard;
+}
+
+function App() {
+  const [players, setPlayer] = useState(PLAYERS);
+  const [gameTurns, setGameTurns] = useState([]);
+  const activePlayer = getActivePlayer(gameTurns);
+  const gameBoard = getGameBoard(gameTurns);
+  const winner = getWinner(gameBoard);
   const hasDraw = gameTurns.length === 9 && !winner;
 
   function handleSelectSquare(rowIndex, colIndex) {
@@ -91,8 +103,16 @@ function App() {
     <main>
       <div id="game-container">
         <ol id="players" className="highlight-player">
-          <Player initialName="Player 1" symbol="X" isActive={activePlayer === "X"} onChangeName={handlePlayerNameChange} />
-          <Player initialName="Player 2" symbol="O" isActive={activePlayer === "O"} onChangeName={handlePlayerNameChange}/>
+          <Player 
+            initialName={PLAYERS.X} 
+            symbol="X" 
+            isActive={activePlayer === "X"} 
+            onChangeName={handlePlayerNameChange} />
+          <Player 
+            initialName={PLAYERS.O} 
+            symbol="O" 
+            isActive={activePlayer === "O"} 
+            onChangeName={handlePlayerNameChange}/>
         </ol>
         {(winner || hasDraw) && (
           <GameOver winner={winner}  onRestart={handleRestart}/>
