@@ -27,7 +27,7 @@ function getActivePlayer(gameTurns) {
   return currentPlayer;
 }
 
-function getWinner(gameBoard) {
+function getWinner(gameBoard, players) {
   let winner;
 
   for(const combination of WINNING_COMBINATIONS) {
@@ -40,7 +40,6 @@ function getWinner(gameBoard) {
       firstSquare === thirdSquare) {
       winner = players[firstSquare];
     }
-
   }
 
   return winner;
@@ -68,7 +67,7 @@ function App() {
   const [gameTurns, setGameTurns] = useState([]);
   const activePlayer = getActivePlayer(gameTurns);
   const gameBoard = getGameBoard(gameTurns);
-  const winner = getWinner(gameBoard);
+  const winner = getWinner(gameBoard, players);
   const hasDraw = gameTurns.length === 9 && !winner;
 
   function handleSelectSquare(rowIndex, colIndex) {
